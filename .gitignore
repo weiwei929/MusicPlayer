@@ -1,36 +1,29 @@
 # 依赖
-node_modules
+/node_modules
+
+# 构建输出
 /dist
 /dist-electron
 
-# 日志
-logs
-*.log
+# 本地环境文件
+.env.local
+.env.*.local
+
+# 日志文件
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
 # 编辑器目录和文件
 .idea
-.vscode/*
-!.vscode/extensions.json
-!.vscode/settings.json
+.vscode
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-.env
-.venv
-env/
-venv/
-ENV/
-
-# 操作系统
+# 操作系统文件
 .DS_Store
 Thumbs.db
