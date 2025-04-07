@@ -1,0 +1,14 @@
+{
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "vetur.validation.template": false,
+    "vetur.validation.script": false,
+    "vetur.validation.style": false,
+    "vetur.format.enable": true,
+    "typescript.validate.enable": false,
+    "javascript.validate.enable": false,
+    "vue.features.codeActions.enable": false,
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "explicit"
+    }
+}

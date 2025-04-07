@@ -1,0 +1,80 @@
+{
+  "name": "musicplayer",
+  "version": "1.0.0",
+  "description": "一个基于 Electron 和 Vue 的音乐播放器",
+  "main": "electron-entry.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "electron:dev": "concurrently \"vite\" \"electron .\"",
+    "electron:build": "vue-tsc --noEmit && vite build && electron-builder",
+    "postinstall": "electron-builder install-app-deps",
+    "start": "electron .",
+    "start:electron": "electron .",
+    "start:vite": "vite",
+    "start:electron:esm": "electron electron-entry.mjs"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.1.0",
+    "@types/howler": "^2.2.12",
+    "axios": "^1.6.2",
+    "electron-store": "^8.2.0",
+    "element-plus": "^2.3.12",
+    "howler": "^2.2.4",
+    "mime-types": "^3.0.1",
+    "music-metadata": "^8.3.0",
+    "node-id3": "^0.2.9",
+    "pinia": "^2.1.7",
+    "uuid": "^9.0.1",
+    "vue": "^3.4.15",
+    "vue-router": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/mime-types": "^2.1.4",
+    "@types/node": "^20.11.10",
+    "@types/uuid": "^9.0.8",
+    "@vitejs/plugin-vue": "^5.0.3",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "electron": "^28.1.0",
+    "electron-builder": "^24.9.1",
+    "electron-builder-squirrel-windows": "^24.9.1",
+    "electron-forge": "^5.2.4",
+    "sass": "^1.69.5",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.12",
+    "vite-plugin-electron": "^0.15.5",
+    "vue-tsc": "^1.8.27"
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "build": {
+    "appId": "com.yourname.musicplayer",
+    "productName": "MusicPlayer",
+    "directories": {
+      "output": "dist_electron",
+      "buildResources": "assets"
+    },
+    "files": [
+      "dist/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "win": {
+      "icon": "assets/icon.ico"
+    },
+    "mac": {
+      "icon": "assets/icon.png"
+    },
+    "linux": {
+      "icon": "assets/icon.png",
+      "category": "Audio"
+    }
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "keywords": []
+}

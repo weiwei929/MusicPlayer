@@ -1,0 +1,12 @@
+{
+    "name": "music-player-electron",
+    "version": "1.0.0",
+    "description": "音乐播放器 Electron 版",
+    "main": "electron-entry.js",
+    "scripts": {
+        "start": "electron ."
+    },
+    "devDependencies": {
+        "electron": "^28.1.0"
+    }
+}

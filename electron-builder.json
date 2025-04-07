@@ -1,0 +1,41 @@
+{
+    "appId": "com.yourcompany.musicplayer",
+    "productName": "Music Player",
+    "directories": {
+        "output": "build"
+    },
+    "files": [
+        "dist-electron/**/*",
+        "dist/**/*"
+    ],
+    "win": {
+        "target": [
+            "nsis"
+        ],
+        "icon": "assets/icon.ico"
+    },
+    "mac": {
+        "target": [
+            "dmg"
+        ],
+        "icon": "assets/icon.icns"
+    },
+    "linux": {
+        "target": [
+            "AppImage"
+        ],
+        "icon": "assets/icon.png"
+    },
+    "extraResources": [
+        {
+            "from": "music",
+            "to": "music"
+        }
+    ],
+    "extraFiles": [
+        {
+            "from": "python_dist",
+            "to": "python_dist"
+        }
+    ]
+}

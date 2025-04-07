@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐播放器 (Web 版)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+        }
+
+        .player-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .album-art {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .controls {
+            margin-top: 20px;
+        }
+
+        .playlist {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="player-container">
+            <div class="row">
+                <div class="col-md-12 text-center mb-4">
+                    <h1>音乐播放器 (Web 版)</h1>
+                    <p class="text-muted">简化版本，无需 Electron</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <img src="https://via.placeholder.com/300" alt="封面图片" class="album-art">
+                </div>
+                <div class="col-md-6">
+                    <h3 id="track-title">加载中...</h3>
+                    <p id="track-artist">艺术家</p>
+                    <p id="track-album">专辑</p>
+
+                    <div class="progress mb-3">
+                        <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <small id="current-time">0:00</small>
+                        <small id="duration">0:00</small>
+                    </div>
+
+                    <div class="controls">
+                        <button class="btn btn-sm btn-outline-secondary" id="prev-btn">
+                            <i class="bi bi-skip-backward-fill"></i> 上一曲
+                        </button>
+                        <button class="btn btn-lg btn-primary" id="play-btn">
+                            <i class="bi bi-play-fill"></i> 播放
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" id="next-btn">
+                            <i class="bi bi-skip-forward-fill"></i> 下一曲
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row playlist">
+                <div class="col-12">
+                    <h4>播放列表</h4>
+                    <div class="list-group" id="playlist">
+                        <a href="#" class="list-group-item list-group-item-action active">
+                            示例音乐 1 - 示例艺术家
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            示例音乐 2 - 示例艺术家
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            示例音乐 3 - 示例艺术家
+                        </a>
+                    </div>
+
+                    <div class="mt-3">
+                        <button class="btn btn-outline-primary" id="import-btn">导入音乐</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/howler@2.2.3/dist/howler.min.js"></script>
+    <script src="main.js"></script>
+    <script>
+        // 简单的播放器功能
+        document.addEventListener('DOMContentLoaded', () => {
+            const playBtn = document.getElementById('play-btn');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const importBtn = document.getElementById('import-btn');
+            const albumArt = document.querySelector('.album-art');
+            const trackTitle = document.getElementById('track-title');
+            const trackArtist = document.getElementById('track-artist');
+            const trackAlbum = document.getElementById('track-album');
+            const currentTime = document.getElementById('current-time');
+            const duration = document.getElementById('duration');
+            const progressBar = document.querySelector('.progress-bar');
+            const playlist = document.getElementById('playlist');
+
+            let isPlaying = false;
+            let sound = null;
+            let currentTrackIndex = 0;
+
+            // 播放特定曲目
+            function playTrack(index) {
+                // 清理之前的实例
+                if (sound) {
+                    sound.unload();
+                }
+
+                currentTrackIndex = index;
+                const track = window.demoTracks[index];
+
+                // 更新界面
+                trackTitle.textContent = track.title;
+                trackArtist.textContent = track.artist;
+                trackAlbum.textContent = `${track.album} (2023)`;
+                duration.textContent = formatTime(track.duration);
+                albumArt.src = track.coverArt;
+
+                // 高亮当前播放的曲目
+                const items = playlist.querySelectorAll('.list-group-item');
+                items.forEach((item, i) => {
+                    if (i === index) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+
+                // 创建新的音频实例
+                sound = new Howl({
+                    src: [track.url],
+                    html5: true,
+                    onplay: function () {
+                        isPlaying = true;
+                        playBtn.innerHTML = '<i class="bi bi-pause-fill"></i> 暂停';
+                        requestAnimationFrame(updateProgress);
+                    },
+                    onpause: function () {
+                        isPlaying = false;
+                        playBtn.innerHTML = '<i class="bi bi-play-fill"></i> 播放';
+                    },
+                    onend: function () {
+                        playTrack((currentTrackIndex + 1) % window.demoTracks.length);
+                    }
+                });
+
+                sound.play();
+            }
+
+            // 更新进度条
+            function updateProgress() {
+                if (sound && isPlaying) {
+                    const seek = sound.seek() || 0;
+                    currentTime.textContent = formatTime(seek);
+                    const percentage = (seek / sound.duration()) * 100 || 0;
+                    progressBar.style.width = percentage + '%';
+                    requestAnimationFrame(updateProgress);
+                }
+            }
+
+            // 格式化时间
+            function formatTime(seconds) {
+                const mins = Math.floor(seconds / 60) || 0;
+                const secs = Math.floor(seconds % 60) || 0;
+                return mins + ':' + (secs < 10 ? '0' : '') + secs;
+            }
+
+            // 播放/暂停按钮
+            playBtn.addEventListener('click', () => {
+                if (!sound) {
+                    playTrack(0);
+                    return;
+                }
+
+                if (isPlaying) {
+                    sound.pause();
+                } else {
+                    sound.play();
+                }
+            });
+
+            // 上一曲按钮
+            prevBtn.addEventListener('click', () => {
+                let index = currentTrackIndex - 1;
+                if (index < 0) index = window.demoTracks.length - 1;
+                playTrack(index);
+            });
+
+            // 下一曲按钮
+            nextBtn.addEventListener('click', () => {
+                let index = currentTrackIndex + 1;
+                if (index >= window.demoTracks.length) index = 0;
+                playTrack(index);
+            });
+
+            // 导入音乐按钮
+            importBtn.addEventListener('click', async () => {
+                try {
+                    // 使用模拟的 IPC 调用
+                    const response = await window.electron.ipcRenderer.invoke('select-music-files');
+                    if (response.success && response.data?.length > 0) {
+                        alert(`已选择 ${response.data.length} 个文件，但这只是演示。`);
+                    }
+                } catch (error) {
+                    console.error('导入失败:', error);
+                }
+            });
+
+            // 生成播放列表
+            function renderPlaylist() {
+                playlist.innerHTML = '';
+                window.demoTracks.forEach((track, index) => {
+                    const item = document.createElement('a');
+                    item.href = '#';
+                    item.className = 'list-group-item list-group-item-action';
+                    if (index === 0) item.classList.add('active');
+                    item.textContent = `${track.title} - ${track.artist}`;
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        playTrack(index);
+                    });
+                    playlist.appendChild(item);
+                });
+            }
+
+            // 初始化
+            window.demoTracks = [
+                {
+                    id: '1',
+                    title: '示例音乐 1',
+                    artist: '示例艺术家',
+                    album: '示例专辑',
+                    duration: 180,
+                    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+                    coverArt: 'https://picsum.photos/seed/music1/300/300'
+                },
+                {
+                    id: '2',
+                    title: '示例音乐 2',
+                    artist: '示例艺术家',
+                    album: '示例专辑',
+                    duration: 210,
+                    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+                    coverArt: 'https://picsum.photos/seed/music2/300/300'
+                },
+                {
+                    id: '3',
+                    title: '示例音乐 3',
+                    artist: '示例艺术家',
+                    album: '示例专辑',
+                    duration: 240,
+                    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+                    coverArt: 'https://picsum.photos/seed/music3/300/300'
+                }
+            ];
+
+            renderPlaylist();
+
+            // 预加载封面图片
+            window.demoTracks.forEach(track => {
+                const img = new Image();
+                img.src = track.coverArt;
+            });
+        });
+    </script>
+</body>
+
+</html>

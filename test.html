@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Electron 测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+
+        h1 {
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Electron 测试成功!</h1>
+    <p>如果您看到这个页面，说明 Electron 基本环境是正常的。</p>
+
+    <script>
+        document.write(`
+      <p>Node.js 版本: ${process.versions.node}</p>
+      <p>Chrome 版本: ${process.versions.chrome}</p>
+      <p>Electron 版本: ${process.versions.electron}</p>
+    `);
+    </script>
+</body>
+
+</html>
